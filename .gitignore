@@ -4,3 +4,5 @@ __pycache__
 *.pyc
 uce_daily/data/results/*
 uce_daily/data/mms/*
+uce_daily/data/market/dam_idm_prices/*
+uce_daily/data/market/unbalance_prices/*
