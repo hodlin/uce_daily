@@ -1,1 +1,5 @@
 *.ini
+.env
+__pycache__
+*.pyc
+uce_daily/data/results/*
