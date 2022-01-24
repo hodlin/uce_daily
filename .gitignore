@@ -3,3 +3,4 @@
 __pycache__
 *.pyc
 uce_daily/data/results/*
+uce_daily/data/mms/*
