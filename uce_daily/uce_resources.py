@@ -162,7 +162,7 @@ def get_applied_forecast(site_id, year, month, connection, db_table):
     forecast_data = pd.DataFrame(columns=['forecast [kWh]'])
     for record in response:
         data = pd.DataFrame(record[1], index=record[0], columns=['forecast [kWh]'])
-        forecast_data = forecast_data.append(data)
+        forecast_data = pd.concat([forecast_data, data])
     forecast_data = forecast_data.sort_index()
     return forecast_data.multiply(1000).astype(int)
 
