@@ -11,7 +11,7 @@ from math import sqrt
 
 from sqlalchemy import create_engine, MetaData, desc
 from sqlalchemy.schema import Table
-from sqlalchemy.sql import select, and_, or_, not_
+from sqlalchemy.sql import select, and_, or_, not_, asc
 
 from settings.db import DO_SETTINGS as do_settings
 from settings.ftp import ceg_fc_settings
@@ -149,6 +149,33 @@ def get_mms_data(site_id, year, month, connection, db_table, include_prev=False)
         mms_data = mms_data_target
     
     return mms_data, version_target
+
+
+def get_current_forecast_1d(site_id, date, time_index, table, connection):
+    
+    query = select([table.c.time_indexes_utc, table.c.energy, table.c.update_version])\
+                .where(and_(table.c.date == date.date(), table.c.site == site_id, table.c.update_version > 0))\
+                .order_by(asc(table.c.update_version))
+    applied_forecasts = connection.execute(query).fetchall()
+
+    versions = list()
+    current_forecast = pd.Series(data=0, index=time_index)
+    for index, forecast_update, version in applied_forecasts:
+        forecast = pd.Series(data=forecast_update, index=index)
+        current_forecast.update(forecast)
+        versions.append(version)
+    return current_forecast.multiply(1000).astype(int)
+
+
+def get_current_forecast(site_id, dates, connection, db_table):
+    daily_forecasts = list()
+    for date in dates:
+        time_index = get_time_index(date)
+        daily_forecast = get_current_forecast_1d(site_id, date, time_index, db_table, connection)
+        daily_forecasts.append(daily_forecast)
+        # print(date, daily_forecast)
+    forecast_data = pd.concat(daily_forecasts)
+    return forecast_data
 
 
 def get_applied_forecast(site_id, year, month, connection, db_table):

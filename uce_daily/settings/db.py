@@ -22,3 +22,21 @@ DO_URL = DO_URL.format(
     DO_SETTINGS["port"],
     DO_SETTINGS["database"],
 )
+
+WAREHOUSE_SETTINGS = {
+    "host": os.environ.get("POSTGRES_HOST"),
+    "port": os.environ.get("POSTGRES_PORT"),
+    "database": os.environ.get("WAREHOUSE_DATABASE"),
+    "user": os.environ.get("WAREHOUSE_USER"),
+    "password": os.environ.get("WAREHOUSE_PASSWORD"),
+}
+
+WAREHOSUE_URL = "postgresql://{}:{}@{}:{}/{}"
+
+WAREHOSUE_URL = WAREHOSUE_URL.format(
+    WAREHOUSE_SETTINGS["user"],
+    WAREHOUSE_SETTINGS["password"],
+    WAREHOUSE_SETTINGS["host"],
+    WAREHOUSE_SETTINGS["port"],
+    WAREHOUSE_SETTINGS["database"],
+)
