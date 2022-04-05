@@ -31,10 +31,10 @@ operation_report_site_list = ['Pohrebyshche', 'Bilashky',
               'Komyshany_1', 'Komyshany_2', 'Bilozerka', 'Myroliubivka', 'Kyselivka',
               'Oleshky_1', 'Oleshky_2', 'Poniativka', 'Kostohryzove',
               'Veliton', 'Velihen', 
-              'Mykolaiivka', 'Rubanivka', 'Mala Lepetykha', 'Kachkarivka',
+              'Mykolaivka', 'Rubanivka', 'Mala_Lepetykha', 'Kachkarivka',
               'Liubymivka', 'Vasylivka',
               'Dibrovka', 'Yelanets_1', 'Yelanets_2',
               'Afanasiivka', 'Novokondakove', 'Bazaltova', 'Inhulets_1', 'Inhulets_2', 'Bereznehuvate',
               'Teplychna', 
-              'Balivka', 'Solone', 'Stepnohirsk'
+              'Balivka', 'Solone', 'Stepnohirsk',
               'Kulevcha' ]
