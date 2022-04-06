@@ -25,7 +25,7 @@ def make_ftp(ftp_settings, supplier=None, logger=None):
     if logger: 
         logger.info(ftp.getwelcome())
     if supplier:
-        ftp.cwd(ftp_settings['forecast_dir'] + supplier)
+        ftp.cwd(ftp_settings['working_dir'] + supplier)
     if logger:
         logger.info('Working directory set as: {}'.format(ftp.pwd()))
     return ftp
@@ -317,7 +317,7 @@ def get_2dah_forecast(site_id, dates, connection, ftp):
         time_index = get_time_index(date)
 
         supplier, file_name = get_fc_info(site_id, time_index.min().date(), available_before=availability, connection=connection)
-        forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['forecast_dir'] + supplier)
+        forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
 
         forecasts.append(forecast)
     forecast = pd.concat(forecasts, axis=0)
@@ -369,7 +369,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
         try:
             supplier, file_name = get_fc_info(site_id, time_index.min().date(), available_before=available_first, connection=connection, db_table=logbook_table)
             print(file_name)
-            forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['forecast_dir'] + supplier)
+            forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
             base_load_mask = forecast <= 0
             forecast = forecast + base_load_mask * base_loads[date.month - 1] / 1000
             daily_forecast.update(forecast)
@@ -384,7 +384,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
                     continue
                 supplier, file_name = get_fc_info(site_id, first_record_stamp, available_before=available, connection=connection, db_table=logbook_table)
                 print(file_name)
-                forecast = get_solargis_forecast(file_name, av_time_index, ftp, FORECAST_FTP['forecast_dir'] + supplier)
+                forecast = get_solargis_forecast(file_name, av_time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
                 
                 base_load_mask = forecast <= 0
                 forecast = forecast + base_load_mask * base_loads[date.month - 1] / 1000

@@ -10,7 +10,7 @@ FORECAST_FTP = {
     'port': int(ceg_ftp_url.split(':')[-1]),
     'user': os.environ.get("CEG_FTP_FORECAST_USER_NAME"),
     'passwd': os.environ.get("CEG_FTP_FORECAST_USER_PASSWORD"),
-    'forecast_dir': os.environ.get("CEG_FTP_FORECAST_USER_FORECAST_DIR"),
+    'working_dir': os.environ.get("CEG_FTP_FORECAST_USER_FORECAST_DIR"),
 }
 
 METER_DATA_FTP = {
@@ -18,5 +18,5 @@ METER_DATA_FTP = {
     'port': int(ceg_ftp_url.split(':')[-1]),
     'user': os.environ.get("CEG_FTP_UTP_DATA_USER_NAME"),
     'passwd': os.environ.get("CEG_FTP_UTP_DATA_USER_PASSWORD"),
-    'forecast_dir': os.environ.get("CEG_FTP_UTP_DATA_USER_FORECAST_DIR"),
+    'working_dir': os.environ.get("CEG_FTP_UTP_DATA_USER_FORECAST_DIR"),
 }
