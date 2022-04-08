@@ -24,16 +24,14 @@ all = [*ceg, *solarm]
 
 test = ['Stepnohirsk', 'Afanasiivka', 'Myroliubivka', 'Pohrebyshche', 'Shyroke']
 
-operation_report_site_list = ['Pohrebyshche', 'Bilashky', 
-                'Bar', 'Balky', 'Verkhivka', 'Kopaihorod', 'Stanislavchyk', 'Sharhorod_1', 'Hnatkiv', 'Porohy',
-                'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 'Cherniatka','Chechelnyk_1', 'Chechelnyk_2',
-                'Komyshany_1', 'Komyshany_2', 'Bilozerka', 'Myroliubivka', 'Kyselivka',
-                'Oleshky_1', 'Oleshky_2', 'Poniativka', 'Kostohryzove', 
-                'Veliton', 'Velihen', 
-                'Mykolaivka', 'Rubanivka', 'Mala_Lepetykha', 'Kachkarivka', 
-                'Liubymivka', 'Vasylivka',
-                'Dibrovka', 'Yelanets_1', 'Yelanets_2', 
-                'Afanasiivka', 'Novokondakove', 'Bazaltova', 'Inhulets_1', 'Inhulets_2', 'Bereznehuvate', 
-                'Teplychna', 
-                'Balivka', 'Solone', 'Stepnohirsk', 
-                'Kulevcha']
+operation_report_site_list = ['Pohrebyshche', 'Bilashky', 'Bar', 'Balky', 'Verkhivka', 
+                              'Kopaihorod', 'Stanislavchyk', 'Sharhorod_1', 'Hnatkiv', 
+                              'Porohy', 'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 
+                              'Cherniatka','Chechelnyk_1', 'Chechelnyk_2', 'Komyshany_1', 
+                              'Komyshany_2', 'Bilozerka', 'Myroliubivka', 'Kyselivka', 'Oleshky_1', 
+                              'Oleshky_2', 'Poniativka', 'Kostohryzove', 'Veliton', 'Velihen', 
+                              'Mykolaivka', 'Rubanivka', 'Mala_Lepetykha', 'Kachkarivka', 
+                              'Liubymivka', 'Vasylivka', 'Dibrovka', 'Yelanets_1', 'Yelanets_2', 
+                              'Afanasiivka', 'Novokondakove', 'Bazaltova', 'Inhulets_1', 'Inhulets_2', 
+                              'Bereznehuvate', 'Teplychna', 'Balivka', 'Solone', 'Stepnohirsk', 'Kulevcha'
+                              ]
