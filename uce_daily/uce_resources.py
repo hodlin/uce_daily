@@ -14,7 +14,7 @@ from sqlalchemy.schema import Table
 from sqlalchemy.sql import select, and_, or_, not_, asc
 
 from settings.db import DO_SETTINGS as do_settings
-from settings.ftp import ceg_fc_settings
+from settings.ftp import FORECAST_FTP
 
 
 def make_ftp(ftp_settings, supplier=None, logger=None):
@@ -25,7 +25,7 @@ def make_ftp(ftp_settings, supplier=None, logger=None):
     if logger: 
         logger.info(ftp.getwelcome())
     if supplier:
-        ftp.cwd(ftp_settings['forecast_dir'] + supplier)
+        ftp.cwd(ftp_settings['working_dir'] + supplier)
     if logger:
         logger.info('Working directory set as: {}'.format(ftp.pwd()))
     return ftp
@@ -317,7 +317,7 @@ def get_2dah_forecast(site_id, dates, connection, ftp):
         time_index = get_time_index(date)
 
         supplier, file_name = get_fc_info(site_id, time_index.min().date(), available_before=availability, connection=connection)
-        forecast = get_solargis_forecast(file_name, time_index, ftp, ceg_fc_settings['forecast_dir'] + supplier)
+        forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
 
         forecasts.append(forecast)
     forecast = pd.concat(forecasts, axis=0)
@@ -352,7 +352,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
     logbook_table = metadata.tables['forecast_logbook']
     base_loads_table = metadata.tables['base_loads']
     if ftp is None:
-        ftp = make_ftp(ceg_fc_settings)
+        ftp = make_ftp(FORECAST_FTP)
     print(type)
     forecasts = list()
     base_loads = get_base_loads(site_id, min(dates), connection, base_loads_table)
@@ -369,7 +369,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
         try:
             supplier, file_name = get_fc_info(site_id, time_index.min().date(), available_before=available_first, connection=connection, db_table=logbook_table)
             print(file_name)
-            forecast = get_solargis_forecast(file_name, time_index, ftp, ceg_fc_settings['forecast_dir'] + supplier)
+            forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
             base_load_mask = forecast <= 0
             forecast = forecast + base_load_mask * base_loads[date.month - 1] / 1000
             daily_forecast.update(forecast)
@@ -384,7 +384,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
                     continue
                 supplier, file_name = get_fc_info(site_id, first_record_stamp, available_before=available, connection=connection, db_table=logbook_table)
                 print(file_name)
-                forecast = get_solargis_forecast(file_name, av_time_index, ftp, ceg_fc_settings['forecast_dir'] + supplier)
+                forecast = get_solargis_forecast(file_name, av_time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
                 
                 base_load_mask = forecast <= 0
                 forecast = forecast + base_load_mask * base_loads[date.month - 1] / 1000
