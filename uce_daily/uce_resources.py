@@ -399,6 +399,9 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
     forecast = pd.concat(forecasts, axis=0)
     return forecast
 
+
+def get_enercast_forecast(site_name, target_year, target_month):
+    pass
     
 
 
