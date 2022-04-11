@@ -400,8 +400,30 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
     return forecast
 
 
-def get_enercast_forecast(site_name, target_year, target_month):
-    pass
+def get_enercast_forecast(site_name, target_year, target_month, type='1_hah'):
+    data_folder = 'data/enercast_forecast/{}-{:0>2}/{}/'.format(target_year, target_month, type)
+    data_file = [file for file in os.listdir(data_folder) if os.path.isfile(os.path.join(data_folder, file)) and file[10:].split(' ')[0] == site_name][0]
+    forecast = pd.read_csv(os.path.join(data_folder, data_file), skiprows=1, header=None, names=['start_time', 'end_time', 'forecast [kWh]'])
+    forecast.index = pd.DatetimeIndex(data=forecast['start_time'])
+    forecast.index.name = None
+    forecast.drop(columns=['start_time', 'end_time'], inplace=True)
+    forecast['forecast [kWh]'] = forecast['forecast [kWh]'] / 60 * 15
+    forecast = forecast.resample('1H', loffset=dt.timedelta(minutes=30)).sum()
+    try:
+        forecast.index = forecast.index.tz_localize(pytz.timezone('europe/kiev')).tz_convert(pytz.utc).tz_localize(None)
+    except pytz.exceptions.NonExistentTimeError as e:
+        forecast = forecast.drop(dt.datetime.strptime(str(e), '%Y-%m-%d %H:%M:%S'))
+        forecast.index = forecast.index.tz_localize(pytz.timezone('europe/kiev')).tz_convert(pytz.utc).tz_localize(None)
+    forecast = forecast.squeeze()
+    print(forecast)
+    base = dt.date(year=target_year, month=target_month, day=1)
+    dates_range = [base + dt.timedelta(days=days) for days in range(calendar.monthrange(target_year, target_month)[-1])]
+
+    daily_forecast = [pd.Series(index=get_time_index(date, timezone='utc'), data=0, name='forecast [kWh]') for date in dates_range]
+    daily_forecast = pd.concat(daily_forecast)
+    daily_forecast.update(forecast)
+    print(daily_forecast)
+    return daily_forecast
     
 
 
@@ -421,6 +443,8 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['pro_forecast_data'].loc[site_data['pro_forecast_data'].index.intersection(index)]
     elif forecast_type == 'restored':
         data = site_data['restored_forecast_data'].loc[site_data['restored_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'enercast':
+        data = site_data['enercast_forecast_data'].loc[site_data['enercast_forecast_data'].index.intersection(index)]
     else:
         data = site_data[forecast_type].loc[site_data[forecast_type].index.intersection(index)]
 
@@ -536,6 +560,8 @@ def make_forecasting_results(site_data, forecast_type, index):
         data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
     elif forecast_type == 'gpee':
         data = site_data['gpee_forecast_data'].loc[site_data['gpee_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'enercast':
+        data = site_data['enercast_forecast_data'].loc[site_data['enercast_forecast_data'].index.intersection(index)]
     else:
         data = site_data[forecast_type].loc[site_data[forecast_type].index.intersection(index)]
 
