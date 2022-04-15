@@ -2,6 +2,8 @@
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 # CEG forecast_user
 ceg_ftp_url = os.environ.get("CEG_FTP_URL")
 
