@@ -24,3 +24,9 @@ WITH (
 
 ALTER TABLE IF EXISTS public.mart_operative_forecasting_result
     OWNER to energy_analytics_owner;
+
+ALTER TABLE IF EXISTS public.mart_operative_forecasting_result
+    ADD COLUMN IF NOT EXISTS capacity_dc integer;
+
+ALTER TABLE IF EXISTS public.mart_operative_forecasting_result
+    ADD COLUMN IF NOT EXISTS grid_capacity integer;
