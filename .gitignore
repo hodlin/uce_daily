@@ -11,3 +11,4 @@ uce_daily/data/enercast_real_data/*
 uce_daily/data/green_tariff/*
 uce_daily/data/operation_report/*
 uce_daily/data/enercast_forecast/*
+uce_daily/data/forecasts/*
