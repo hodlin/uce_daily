@@ -2,7 +2,7 @@
 vinnytsia = ['Bar', 'Verkhivka', 'Balky', 'Sharhorod_1', 'Chechelnyk_1', 'Chechelnyk_2', 'Stanislavchyk', 'Kopaihorod',
                    'Cherniatka', 'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 'Pohrebyshche', 'Bilashky', 'Porohy', 'Hnatkiv']
 
-kherson = ['Myroliubivka', 'Novokondakove', 'Kyselivka', 'Poniativka', 'Kostohryzove', 'Bilozerka', 'Mykolaivka', 
+kherson = ['Myroliubivka', 'Kyselivka', 'Poniativka', 'Kostohryzove', 'Bilozerka', 'Mykolaivka', 
                  'Komyshany_1', 'Komyshany_2', 'Velihen', 'Veliton', 'Mala_Lepetykha', 'Rubanivka', 'Oleshky_2', 'Oleshky_1',
                  'Liubymivka', 'Kachkarivka', 'Vasylivka']
 
