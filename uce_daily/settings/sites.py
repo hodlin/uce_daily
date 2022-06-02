@@ -6,7 +6,7 @@ kherson = ['Myroliubivka', 'Kyselivka', 'Poniativka', 'Kostohryzove', 'Bilozerka
                  'Komyshany_1', 'Komyshany_2', 'Velihen', 'Veliton', 'Mala_Lepetykha', 'Rubanivka', 'Oleshky_2', 'Oleshky_1',
                  'Liubymivka', 'Kachkarivka', 'Vasylivka']
 
-mykolaiiv = ['Afanasiivka', 'Bazaltova', 'Yelanets_1', 'Yelanets_2', 'Inhulets_1', 'Inhulets_2', 'Bereznehuvate', 'Teplychna']
+mykolaiiv = ['Afanasiivka', 'Novokondakove', 'Bazaltova', 'Yelanets_1', 'Yelanets_2', 'Inhulets_1', 'Inhulets_2', 'Bereznehuvate', 'Teplychna']
 
 zaporizhzhia = ['Solone', 'Stepnohirsk']
 
