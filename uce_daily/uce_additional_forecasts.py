@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     forecasts_types = ['real', 'naive', 'zero', '1_dah', 'pro', 'restored']
 
-    sites_list = ['Myroliubivka']
+    # sites_list = ['Myroliubivka']
     sites_data = dict.fromkeys(sites_list)
     print(sites_data)
     print(len(sites_data.keys()))
