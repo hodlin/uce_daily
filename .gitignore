@@ -14,3 +14,5 @@ uce_daily/data/enercast_forecast/*
 uce_daily/data/forecasts/*
 *.DS_Store
 *.vscode
+credentials.json
+token.pickle
