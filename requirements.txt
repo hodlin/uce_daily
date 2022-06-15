@@ -47,3 +47,11 @@ traitlets==5.1.1
 typing_extensions==4.0.1
 wcwidth==0.2.5
 xlrd==2.0.1
+plotly
+chart-studio
+google-api-core==1.26.3
+google-api-python-client==2.2.0
+google-auth==1.30.0
+google-auth-httplib2==0.1.0
+google-auth-oauthlib==0.4.4
+googleapis-common-protos==1.53.0

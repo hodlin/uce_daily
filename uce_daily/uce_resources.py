@@ -11,10 +11,10 @@ from math import sqrt
 
 from sqlalchemy import create_engine, MetaData, desc
 from sqlalchemy.schema import Table
-from sqlalchemy.sql import select, and_, or_, not_
+from sqlalchemy.sql import select, and_, or_, not_, asc
 
 from settings.db import DO_SETTINGS as do_settings
-from settings.ftp import ceg_fc_settings
+from settings.ftp import FORECAST_FTP
 
 
 def make_ftp(ftp_settings, supplier=None, logger=None):
@@ -25,7 +25,7 @@ def make_ftp(ftp_settings, supplier=None, logger=None):
     if logger: 
         logger.info(ftp.getwelcome())
     if supplier:
-        ftp.cwd(ftp_settings['forecast_dir'] + supplier)
+        ftp.cwd(ftp_settings['working_dir'] + supplier)
     if logger:
         logger.info('Working directory set as: {}'.format(ftp.pwd()))
     return ftp
@@ -151,6 +151,33 @@ def get_mms_data(site_id, year, month, connection, db_table, include_prev=False)
     return mms_data, version_target
 
 
+def get_current_forecast_1d(site_id, date, time_index, table, connection):
+    
+    query = select([table.c.time_indexes_utc, table.c.energy, table.c.update_version])\
+                .where(and_(table.c.date == date.date(), table.c.site == site_id, table.c.update_version > 0))\
+                .order_by(asc(table.c.update_version))
+    applied_forecasts = connection.execute(query).fetchall()
+
+    versions = list()
+    current_forecast = pd.Series(data=0, index=time_index)
+    for index, forecast_update, version in applied_forecasts:
+        forecast = pd.Series(data=forecast_update, index=index)
+        current_forecast.update(forecast)
+        versions.append(version)
+    return current_forecast.multiply(1000).astype(int)
+
+
+def get_current_forecast(site_id, dates, connection, db_table):
+    daily_forecasts = list()
+    for date in dates:
+        time_index = get_time_index(date)
+        daily_forecast = get_current_forecast_1d(site_id, date, time_index, db_table, connection)
+        daily_forecasts.append(daily_forecast)
+        # print(date, daily_forecast)
+    forecast_data = pd.concat(daily_forecasts)
+    return forecast_data
+
+
 def get_applied_forecast(site_id, year, month, connection, db_table):
     base = dt.date(year=year, month=month, day=1)
     dates_range = [base + dt.timedelta(days=days) for days in range(calendar.monthrange(year, month)[-1])]
@@ -162,7 +189,7 @@ def get_applied_forecast(site_id, year, month, connection, db_table):
     forecast_data = pd.DataFrame(columns=['forecast [kWh]'])
     for record in response:
         data = pd.DataFrame(record[1], index=record[0], columns=['forecast [kWh]'])
-        forecast_data = forecast_data.append(data)
+        forecast_data = pd.concat([forecast_data, data])
     forecast_data = forecast_data.sort_index()
     return forecast_data.multiply(1000).astype(int)
 
@@ -290,7 +317,7 @@ def get_2dah_forecast(site_id, dates, connection, ftp):
         time_index = get_time_index(date)
 
         supplier, file_name = get_fc_info(site_id, time_index.min().date(), available_before=availability, connection=connection)
-        forecast = get_solargis_forecast(file_name, time_index, ftp, ceg_fc_settings['forecast_dir'] + supplier)
+        forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
 
         forecasts.append(forecast)
     forecast = pd.concat(forecasts, axis=0)
@@ -325,7 +352,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
     logbook_table = metadata.tables['forecast_logbook']
     base_loads_table = metadata.tables['base_loads']
     if ftp is None:
-        ftp = make_ftp(ceg_fc_settings)
+        ftp = make_ftp(FORECAST_FTP)
     print(type)
     forecasts = list()
     base_loads = get_base_loads(site_id, min(dates), connection, base_loads_table)
@@ -342,7 +369,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
         try:
             supplier, file_name = get_fc_info(site_id, time_index.min().date(), available_before=available_first, connection=connection, db_table=logbook_table)
             print(file_name)
-            forecast = get_solargis_forecast(file_name, time_index, ftp, ceg_fc_settings['forecast_dir'] + supplier)
+            forecast = get_solargis_forecast(file_name, time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
             base_load_mask = forecast <= 0
             forecast = forecast + base_load_mask * base_loads[date.month - 1] / 1000
             daily_forecast.update(forecast)
@@ -357,7 +384,7 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
                     continue
                 supplier, file_name = get_fc_info(site_id, first_record_stamp, available_before=available, connection=connection, db_table=logbook_table)
                 print(file_name)
-                forecast = get_solargis_forecast(file_name, av_time_index, ftp, ceg_fc_settings['forecast_dir'] + supplier)
+                forecast = get_solargis_forecast(file_name, av_time_index, ftp, FORECAST_FTP['working_dir'] + supplier)
                 
                 base_load_mask = forecast <= 0
                 forecast = forecast + base_load_mask * base_loads[date.month - 1] / 1000
@@ -372,6 +399,31 @@ def get_forecast(site_id, dates, type, connection, metadata, timezone='utc', ftp
     forecast = pd.concat(forecasts, axis=0)
     return forecast
 
+
+def get_enercast_forecast(site_name, target_year, target_month, type='1_hah'):
+    data_folder = 'data/enercast_forecast/{}-{:0>2}/{}/'.format(target_year, target_month, type)
+    data_file = [file for file in os.listdir(data_folder) if os.path.isfile(os.path.join(data_folder, file)) and file[10:].split(' ')[0] == site_name][0]
+    forecast = pd.read_csv(os.path.join(data_folder, data_file), skiprows=1, header=None, names=['start_time', 'end_time', 'forecast [kWh]'])
+    forecast.index = pd.DatetimeIndex(data=forecast['start_time'])
+    forecast.index.name = None
+    forecast.drop(columns=['start_time', 'end_time'], inplace=True)
+    forecast['forecast [kWh]'] = forecast['forecast [kWh]'] / 60 * 15
+    forecast = forecast.resample('1H', loffset=dt.timedelta(minutes=30)).sum()
+    try:
+        forecast.index = forecast.index.tz_localize(pytz.timezone('europe/kiev')).tz_convert(pytz.utc).tz_localize(None)
+    except pytz.exceptions.NonExistentTimeError as e:
+        forecast = forecast.drop(dt.datetime.strptime(str(e), '%Y-%m-%d %H:%M:%S'))
+        forecast.index = forecast.index.tz_localize(pytz.timezone('europe/kiev')).tz_convert(pytz.utc).tz_localize(None)
+    forecast = forecast.squeeze()
+    print(forecast)
+    base = dt.date(year=target_year, month=target_month, day=1)
+    dates_range = [base + dt.timedelta(days=days) for days in range(calendar.monthrange(target_year, target_month)[-1])]
+
+    daily_forecast = [pd.Series(index=get_time_index(date, timezone='utc'), data=0, name='forecast [kWh]') for date in dates_range]
+    daily_forecast = pd.concat(daily_forecast)
+    daily_forecast.update(forecast)
+    print(daily_forecast)
+    return daily_forecast
     
 
 
@@ -379,6 +431,8 @@ def make_results(site_data, forecast_type, prices, index):
     #print(site_data)
     if forecast_type == 'real':
         data = site_data['real_forecast_data'].loc[site_data['real_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'limitation':
+        data = site_data['limitation_forecast_data'].loc[site_data['limitation_forecast_data'].index.intersection(index)]
     elif forecast_type == 'naive':
         data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
     elif forecast_type == 'zero':
@@ -389,6 +443,14 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['pro_forecast_data'].loc[site_data['pro_forecast_data'].index.intersection(index)]
     elif forecast_type == 'restored':
         data = site_data['restored_forecast_data'].loc[site_data['restored_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'enercast':
+        data = site_data['enercast_forecast_data'].loc[site_data['enercast_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_10':
+        data = site_data['increased_10_forecast_data'].loc[site_data['increased_10_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_20':
+        data = site_data['increased_20_forecast_data'].loc[site_data['increased_20_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_30':
+        data = site_data['increased_30_forecast_data'].loc[site_data['increased_30_forecast_data'].index.intersection(index)]
     else:
         data = site_data[forecast_type].loc[site_data[forecast_type].index.intersection(index)]
 
@@ -498,10 +560,14 @@ def make_results(site_data, forecast_type, prices, index):
 def make_forecasting_results(site_data, forecast_type, index):
     if forecast_type == 'real':
         data = site_data['real_forecast_data'].loc[site_data['real_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'limitation':
+        data = site_data['limitation_forecast_data'].loc[site_data['limitation_forecast_data'].index.intersection(index)]
     elif forecast_type == 'naive':
         data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
     elif forecast_type == 'gpee':
         data = site_data['gpee_forecast_data'].loc[site_data['gpee_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'enercast':
+        data = site_data['enercast_forecast_data'].loc[site_data['enercast_forecast_data'].index.intersection(index)]
     else:
         data = site_data[forecast_type].loc[site_data[forecast_type].index.intersection(index)]
 
