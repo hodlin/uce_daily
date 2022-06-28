@@ -16,3 +16,4 @@ uce_daily/data/forecasts/*
 *.vscode
 credentials.json
 token.pickle
+uce_daily/data/gmail_parsing/*
