@@ -113,7 +113,25 @@ if __name__ == '__main__':
             increased_30_forecast = pd.concat([mms_data, increased_30_forecast.round(0)], axis=1, join='inner')
             site_data['increased_30_forecast_data'] = increased_30_forecast
             print('Increased forecast +30pu data prepared')
-            
+
+            decreased_30_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_30_forecast.loc[decreased_30_forecast > 0] = decreased_30_forecast.loc[decreased_30_forecast > 0] * 0.7
+            decreased_30_forecast = pd.concat([mms_data, decreased_30_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_30_forecast_data'] = decreased_30_forecast
+            print('Decreased forecast -30pu data prepared')
+
+            decreased_20_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_20_forecast.loc[decreased_20_forecast > 0] = decreased_20_forecast.loc[decreased_20_forecast > 0] * 0.8
+            decreased_20_forecast = pd.concat([mms_data, decreased_20_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_20_forecast_data'] = decreased_20_forecast
+            print('Decreased forecast -20pu data prepared')
+
+            decreased_10_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_10_forecast.loc[decreased_10_forecast > 0] = decreased_10_forecast.loc[decreased_10_forecast > 0] * 0.9
+            decreased_10_forecast = pd.concat([mms_data, decreased_10_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_10_forecast_data'] = decreased_10_forecast
+            print('Decreased forecast -10pu data prepared')
+
             sites_data.update({site: site_data})
             end = time.time()
 
@@ -156,6 +174,9 @@ if __name__ == '__main__':
     results_increased_10 = pd.DataFrame(columns=columns)
     results_increased_20 = pd.DataFrame(columns=columns)
     results_increased_30 = pd.DataFrame(columns=columns)
+    results_decreased_30 = pd.DataFrame(columns=columns)
+    results_decreased_20 = pd.DataFrame(columns=columns)
+    results_decreased_10 = pd.DataFrame(columns=columns)
 
     for site in sites_data.keys():
         
@@ -189,6 +210,15 @@ if __name__ == '__main__':
             result_increased_30 = make_results(sites_data[site], 'increased_30', prices, index)
             #print(result_increased_30)
 
+            result_decreased_30 = make_results(sites_data[site], 'decreased_30', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_20 = make_results(sites_data[site], 'decreased_20', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_10 = make_results(sites_data[site], 'decreased_10', prices, index)
+            #print(result_increased_30)
+
             if not result_real is None:
                 results_real = results_real.append(result_real, ignore_index=True)
 
@@ -216,6 +246,15 @@ if __name__ == '__main__':
             if not result_increased_30 is None:
                 results_increased_30 = results_increased_30.append(result_increased_30, ignore_index=True)
 
+            if not result_decreased_30 is None:
+                results_decreased_30 = results_decreased_30.append(result_decreased_30, ignore_index=True)
+            
+            if not result_decreased_20 is None:
+                results_decreased_20 = results_decreased_20.append(result_decreased_20, ignore_index=True)
+
+            if not result_decreased_10 is None:
+                results_decreased_10 = results_decreased_10.append(result_decreased_10, ignore_index=True)
+
 
 
         sites_data[site]['results_real'] = results_real
@@ -227,6 +266,9 @@ if __name__ == '__main__':
         sites_data[site]['results_increased_10'] = results_increased_10
         sites_data[site]['results_increased_20'] = results_increased_20
         sites_data[site]['results_increased_30'] = results_increased_30
+        sites_data[site]['results_decreased_30'] = results_decreased_30
+        sites_data[site]['results_decreased_20'] = results_decreased_20
+        sites_data[site]['results_decreased_10'] = results_decreased_10
 
 
         print(f'{site} - Results daily: Ok!')
