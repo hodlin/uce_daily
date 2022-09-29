@@ -274,7 +274,7 @@ if __name__ == '__main__':
         print(f'{site} - Results daily: Ok!')
 
 
-    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30], axis=0)
+    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30, results_decreased_30, results_decreased_20, results_decreased_10], axis=0)
 
     days = '{}-{}'.format(results_daily['first_date'].min().day, results_daily['first_date'].max().day)
 
