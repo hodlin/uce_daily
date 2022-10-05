@@ -114,6 +114,18 @@ if __name__ == '__main__':
             site_data['increased_30_forecast_data'] = increased_30_forecast
             print('Increased forecast +30pu data prepared')
 
+            decreased_50_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_50_forecast.loc[decreased_50_forecast > 0] = decreased_50_forecast.loc[decreased_50_forecast > 0] * 0.5
+            decreased_50_forecast = pd.concat([mms_data, decreased_50_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_50_forecast_data'] = decreased_50_forecast
+            print('Decreased forecast -50pu data prepared')
+
+            decreased_40_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_40_forecast.loc[decreased_40_forecast > 0] = decreased_40_forecast.loc[decreased_40_forecast > 0] * 0.6
+            decreased_40_forecast = pd.concat([mms_data, decreased_40_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_40_forecast_data'] = decreased_40_forecast
+            print('Decreased forecast -40pu data prepared')
+
             decreased_30_forecast = restored_forecast['forecast [kWh]'].copy()
             decreased_30_forecast.loc[decreased_30_forecast > 0] = decreased_30_forecast.loc[decreased_30_forecast > 0] * 0.7
             decreased_30_forecast = pd.concat([mms_data, decreased_30_forecast.round(0)], axis=1, join='inner')
@@ -174,6 +186,8 @@ if __name__ == '__main__':
     results_increased_10 = pd.DataFrame(columns=columns)
     results_increased_20 = pd.DataFrame(columns=columns)
     results_increased_30 = pd.DataFrame(columns=columns)
+    results_decreased_50 = pd.DataFrame(columns=columns)
+    results_decreased_40 = pd.DataFrame(columns=columns)
     results_decreased_30 = pd.DataFrame(columns=columns)
     results_decreased_20 = pd.DataFrame(columns=columns)
     results_decreased_10 = pd.DataFrame(columns=columns)
@@ -208,6 +222,12 @@ if __name__ == '__main__':
             #print(result_increased_20)
 
             result_increased_30 = make_results(sites_data[site], 'increased_30', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_50 = make_results(sites_data[site], 'decreased_50', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_40 = make_results(sites_data[site], 'decreased_40', prices, index)
             #print(result_increased_30)
 
             result_decreased_30 = make_results(sites_data[site], 'decreased_30', prices, index)
@@ -245,6 +265,12 @@ if __name__ == '__main__':
 
             if not result_increased_30 is None:
                 results_increased_30 = results_increased_30.append(result_increased_30, ignore_index=True)
+            
+            if not result_decreased_50 is None:
+                results_decreased_50 = results_decreased_50.append(result_decreased_50, ignore_index=True)
+
+            if not result_decreased_40 is None:
+                results_decreased_40 = results_decreased_40.append(result_decreased_40, ignore_index=True)
 
             if not result_decreased_30 is None:
                 results_decreased_30 = results_decreased_30.append(result_decreased_30, ignore_index=True)
@@ -266,6 +292,8 @@ if __name__ == '__main__':
         sites_data[site]['results_increased_10'] = results_increased_10
         sites_data[site]['results_increased_20'] = results_increased_20
         sites_data[site]['results_increased_30'] = results_increased_30
+        sites_data[site]['results_decreased_50'] = results_decreased_50
+        sites_data[site]['results_decreased_40'] = results_decreased_40
         sites_data[site]['results_decreased_30'] = results_decreased_30
         sites_data[site]['results_decreased_20'] = results_decreased_20
         sites_data[site]['results_decreased_10'] = results_decreased_10
@@ -274,7 +302,7 @@ if __name__ == '__main__':
         print(f'{site} - Results daily: Ok!')
 
 
-    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30, results_decreased_30, results_decreased_20, results_decreased_10], axis=0)
+    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30, results_decreased_50, results_decreased_40, results_decreased_30, results_decreased_20, results_decreased_10], axis=0)
 
     days = '{}-{}'.format(results_daily['first_date'].min().day, results_daily['first_date'].max().day)
 
