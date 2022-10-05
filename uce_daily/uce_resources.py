@@ -451,6 +451,10 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['increased_20_forecast_data'].loc[site_data['increased_20_forecast_data'].index.intersection(index)]
     elif forecast_type == 'increased_30':
         data = site_data['increased_30_forecast_data'].loc[site_data['increased_30_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_50':
+        data = site_data['decreased_50_forecast_data'].loc[site_data['decreased_50_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_40':
+        data = site_data['decreased_40_forecast_data'].loc[site_data['decreased_40_forecast_data'].index.intersection(index)]
     elif forecast_type == 'decreased_30':
         data = site_data['decreased_30_forecast_data'].loc[site_data['decreased_30_forecast_data'].index.intersection(index)]
     elif forecast_type == 'decreased_20':
