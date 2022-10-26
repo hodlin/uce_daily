@@ -24,6 +24,8 @@ all = [*ceg, *solarm]
 
 test = ['Stepnohirsk', 'Afanasiivka', 'Myroliubivka', 'Pohrebyshche', 'Shyroke']
 
+rengy_d = ['Porohy']
+
 operation_report_site_list = ['Pohrebyshche', 'Bilashky', 'Bar', 'Balky', 'Verkhivka', 
                               'Kopaihorod', 'Stanislavchyk', 'Sharhorod_1', 'Hnatkiv', 
                               'Porohy', 'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 
