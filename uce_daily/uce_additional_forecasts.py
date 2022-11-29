@@ -35,6 +35,10 @@ if __name__ == '__main__':
         
         prices = get_prices(target_year, target_month, connection, metadata.tables['electricity_market_prices'], currency='UAH')
 
+    # price_dir = 'data/results/2022-10/'
+    # price_file = 'prices_2022_10_1-19.xlsx'
+    # prices = pd.read_excel(price_dir + price_file, index_col= 0)
+
     print(prices)
 
     target_dates = pd.date_range(start=prices.index.date.min() + dt.timedelta(days=1),
@@ -96,6 +100,48 @@ if __name__ == '__main__':
             site_data['restored_forecast_data'] = restored_forecast
             print('Restored forecast data prepared')
 
+            decreased_70_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_70_forecast.loc[decreased_70_forecast > 0] = decreased_70_forecast.loc[decreased_70_forecast > 0] * 0.3
+            decreased_70_forecast = pd.concat([mms_data, decreased_70_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_70_forecast_data'] = decreased_70_forecast
+            print('Decreased forecast -70pu data prepared')
+            
+            decreased_60_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_60_forecast.loc[decreased_60_forecast > 0] = decreased_60_forecast.loc[decreased_60_forecast > 0] * 0.4
+            decreased_60_forecast = pd.concat([mms_data, decreased_60_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_60_forecast_data'] = decreased_60_forecast
+            print('Decreased forecast -60pu data prepared')
+
+            decreased_50_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_50_forecast.loc[decreased_50_forecast > 0] = decreased_50_forecast.loc[decreased_50_forecast > 0] * 0.5
+            decreased_50_forecast = pd.concat([mms_data, decreased_50_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_50_forecast_data'] = decreased_50_forecast
+            print('Decreased forecast -50pu data prepared')
+
+            decreased_40_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_40_forecast.loc[decreased_40_forecast > 0] = decreased_40_forecast.loc[decreased_40_forecast > 0] * 0.6
+            decreased_40_forecast = pd.concat([mms_data, decreased_40_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_40_forecast_data'] = decreased_40_forecast
+            print('Decreased forecast -40pu data prepared')
+
+            decreased_30_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_30_forecast.loc[decreased_30_forecast > 0] = decreased_30_forecast.loc[decreased_30_forecast > 0] * 0.7
+            decreased_30_forecast = pd.concat([mms_data, decreased_30_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_30_forecast_data'] = decreased_30_forecast
+            print('Decreased forecast -30pu data prepared')
+
+            decreased_20_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_20_forecast.loc[decreased_20_forecast > 0] = decreased_20_forecast.loc[decreased_20_forecast > 0] * 0.8
+            decreased_20_forecast = pd.concat([mms_data, decreased_20_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_20_forecast_data'] = decreased_20_forecast
+            print('Decreased forecast -20pu data prepared')
+
+            decreased_10_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_10_forecast.loc[decreased_10_forecast > 0] = decreased_10_forecast.loc[decreased_10_forecast > 0] * 0.9
+            decreased_10_forecast = pd.concat([mms_data, decreased_10_forecast.round(0)], axis=1, join='inner')
+            site_data['decreased_10_forecast_data'] = decreased_10_forecast
+            print('Decreased forecast -10pu data prepared')
+
             increased_10_forecast = restored_forecast['forecast [kWh]'].copy()
             increased_10_forecast.loc[increased_10_forecast > 0] = increased_10_forecast.loc[increased_10_forecast > 0] * 1.1
             increased_10_forecast = pd.concat([mms_data, increased_10_forecast.round(0)], axis=1, join='inner')
@@ -113,7 +159,7 @@ if __name__ == '__main__':
             increased_30_forecast = pd.concat([mms_data, increased_30_forecast.round(0)], axis=1, join='inner')
             site_data['increased_30_forecast_data'] = increased_30_forecast
             print('Increased forecast +30pu data prepared')
-            
+
             sites_data.update({site: site_data})
             end = time.time()
 
@@ -153,6 +199,13 @@ if __name__ == '__main__':
     results_1_dah = pd.DataFrame(columns=columns)
     # results_pro = pd.DataFrame(columns=columns)
     results_restored = pd.DataFrame(columns=columns)
+    results_decreased_70 = pd.DataFrame(columns=columns)
+    results_decreased_60 = pd.DataFrame(columns=columns)
+    results_decreased_50 = pd.DataFrame(columns=columns)
+    results_decreased_40 = pd.DataFrame(columns=columns)
+    results_decreased_30 = pd.DataFrame(columns=columns)
+    results_decreased_20 = pd.DataFrame(columns=columns)
+    results_decreased_10 = pd.DataFrame(columns=columns)
     results_increased_10 = pd.DataFrame(columns=columns)
     results_increased_20 = pd.DataFrame(columns=columns)
     results_increased_30 = pd.DataFrame(columns=columns)
@@ -180,6 +233,27 @@ if __name__ == '__main__':
             result_restored = make_results(sites_data[site], 'restored', prices, index)
             #print(result_restored)
 
+            result_decreased_70 = make_results(sites_data[site], 'decreased_70', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_60 = make_results(sites_data[site], 'decreased_60', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_50 = make_results(sites_data[site], 'decreased_50', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_40 = make_results(sites_data[site], 'decreased_40', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_30 = make_results(sites_data[site], 'decreased_30', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_20 = make_results(sites_data[site], 'decreased_20', prices, index)
+            #print(result_increased_30)
+
+            result_decreased_10 = make_results(sites_data[site], 'decreased_10', prices, index)
+            #print(result_increased_30)
+
             result_increased_10 = make_results(sites_data[site], 'increased_10', prices, index)
             #print(result_increased_10)
 
@@ -206,6 +280,27 @@ if __name__ == '__main__':
 
             if not result_restored is None:
                 results_restored = results_restored.append(result_restored, ignore_index=True)
+            
+            if not result_decreased_70 is None:
+                results_decreased_70 = results_decreased_70.append(result_decreased_70, ignore_index=True)
+
+            if not result_decreased_60 is None:
+                results_decreased_60 = results_decreased_60.append(result_decreased_60, ignore_index=True)
+
+            if not result_decreased_50 is None:
+                results_decreased_50 = results_decreased_50.append(result_decreased_50, ignore_index=True)
+
+            if not result_decreased_40 is None:
+                results_decreased_40 = results_decreased_40.append(result_decreased_40, ignore_index=True)
+
+            if not result_decreased_30 is None:
+                results_decreased_30 = results_decreased_30.append(result_decreased_30, ignore_index=True)
+            
+            if not result_decreased_20 is None:
+                results_decreased_20 = results_decreased_20.append(result_decreased_20, ignore_index=True)
+
+            if not result_decreased_10 is None:
+                results_decreased_10 = results_decreased_10.append(result_decreased_10, ignore_index=True)
 
             if not result_increased_10 is None:
                 results_increased_10 = results_increased_10.append(result_increased_10, ignore_index=True)
@@ -224,19 +319,25 @@ if __name__ == '__main__':
         sites_data[site]['results_1_dah'] = results_1_dah
         # sites_data[site]['results_pro'] = results_pro
         sites_data[site]['results_restored'] = results_restored
+        sites_data[site]['results_decreased_70'] = results_decreased_70
+        sites_data[site]['results_decreased_60'] = results_decreased_60
+        sites_data[site]['results_decreased_50'] = results_decreased_50
+        sites_data[site]['results_decreased_40'] = results_decreased_40
+        sites_data[site]['results_decreased_30'] = results_decreased_30
+        sites_data[site]['results_decreased_20'] = results_decreased_20
+        sites_data[site]['results_decreased_10'] = results_decreased_10
         sites_data[site]['results_increased_10'] = results_increased_10
         sites_data[site]['results_increased_20'] = results_increased_20
         sites_data[site]['results_increased_30'] = results_increased_30
 
-
         print(f'{site} - Results daily: Ok!')
 
 
-    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30], axis=0)
+    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30, results_decreased_70, results_decreased_60, results_decreased_50, results_decreased_40, results_decreased_30, results_decreased_20, results_decreased_10], axis=0)
 
     days = '{}-{}'.format(results_daily['first_date'].min().day, results_daily['first_date'].max().day)
 
-    with pd.ExcelWriter('data/results/{}-{:0>2}/uce_a_daily_{}_{}_{}_UAH.xlsx'.format(target_year, target_month, target_year, target_month, days), engine="openpyxl") as writer:
+    with pd.ExcelWriter('data/results/{}-{:0>2}/uce_a_daily_porohy_{}_{}_{}_UAH.xlsx'.format(target_year, target_month, target_year, target_month, days), engine="openpyxl") as writer:
         results_daily.to_excel(writer, 'results_daily')
 
     print('Saving results: ok!')
