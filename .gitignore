@@ -1,5 +1,6 @@
 *.ini
 .env
+.idea
 __pycache__
 *.pyc
 uce_daily/data/results/*
@@ -17,3 +18,4 @@ uce_daily/data/forecasts/*
 credentials.json
 token.pickle
 uce_daily/data/gmail_parsing/*
+uce_daily/data/solargis/*

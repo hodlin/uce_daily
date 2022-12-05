@@ -337,7 +337,7 @@ if __name__ == '__main__':
 
     days = '{}-{}'.format(results_daily['first_date'].min().day, results_daily['first_date'].max().day)
 
-    with pd.ExcelWriter('data/results/{}-{:0>2}/uce_a_daily_porohy_{}_{}_{}_UAH.xlsx'.format(target_year, target_month, target_year, target_month, days), engine="openpyxl") as writer:
+    with pd.ExcelWriter('data/results/{}-{:0>2}/uce_a_daily_{}_{}_{}_UAH.xlsx'.format(target_year, target_month, target_year, target_month, days), engine="openpyxl") as writer:
         results_daily.to_excel(writer, 'results_daily')
 
     print('Saving results: ok!')

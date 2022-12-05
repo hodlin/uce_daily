@@ -443,6 +443,8 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['pro_forecast_data'].loc[site_data['pro_forecast_data'].index.intersection(index)]
     elif forecast_type == 'restored':
         data = site_data['restored_forecast_data'].loc[site_data['restored_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'restored_lim':
+        data = site_data['restored_forecast_data_lim'].loc[site_data['restored_forecast_data_lim'].index.intersection(index)]
     elif forecast_type == 'enercast':
         data = site_data['enercast_forecast_data'].loc[site_data['enercast_forecast_data'].index.intersection(index)]
     elif forecast_type == 'decreased_70':
@@ -506,8 +508,13 @@ def make_results(site_data, forecast_type, prices, index):
         mask_641 = mask_641_1 | mask_641_2
         
         data['641_mask'] = mask_641 & data['alfa_u_mask']
+        data['641_mask_positive'] = mask_641_1 & data['alfa_u_mask']
+        data['641_mask_negative'] = mask_641_2 & data['alfa_u_mask']
+        
         data['641_price'] = data['dam'] - data['imsp']
         data['cieq_641_rule* [UAH]'] = data['error_u [kWh]'] * data['641_price'] * data['641_mask'] * data['alfa_u_mask']
+        data['cieq_641_rule_positive* [UAH]'] = data['error_u [kWh]'] * data['641_price'] * data['641_mask_positive'] * data['alfa_u_mask']
+        data['cieq_641_rule_negative* [UAH]'] = data['error_u [kWh]'] * data['641_price'] * data['641_mask_negative'] * data['alfa_u_mask']
 
         result = dict()
         
@@ -561,12 +568,16 @@ def make_results(site_data, forecast_type, prices, index):
                                                         result['yielded [kWh]'] * 1000
 
         result['cieq_641_rule* [UAH]'] = data['cieq_641_rule* [UAH]'].sum()
+        result['cieq_641_rule_positive* [UAH]'] = data['cieq_641_rule_positive* [UAH]'].sum()
+        result['cieq_641_rule_negative* [UAH]'] = data['cieq_641_rule_negative* [UAH]'].sum()
         result['cieq_641_rule* [%]'] = data['cieq_641_rule* [UAH]'].sum() / data['revenue [UAH]'].sum() * 100
+        result['cieq_641_rule_positive* [%]'] = data['cieq_641_rule_positive* [UAH]'].sum() / data['revenue [UAH]'].sum() * 100
+        result['cieq_641_rule_negative* [%]'] = data['cieq_641_rule_negative* [UAH]'].sum() / data['revenue [UAH]'].sum() * 100
 
         result['imsp_avg_641_rule* [UAH/MWh]'] = data['cieq_641_rule* [UAH]'].sum() / \
                                                         result['yielded [kWh]'] * 1000
 
-    #print(result)
+    # print(result)
 
     return pd.Series(result)
 
