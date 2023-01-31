@@ -19,3 +19,4 @@ credentials.json
 token.pickle
 uce_daily/data/gmail_parsing/*
 uce_daily/data/solargis/*
+uce_daily/data/utp_mock-up/*
