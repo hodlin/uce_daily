@@ -11,7 +11,7 @@ from math import sqrt
 
 from sqlalchemy import create_engine, MetaData, desc
 from sqlalchemy.schema import Table
-from sqlalchemy.sql import select, and_, or_, not_, asc
+from sqlalchemy.sql import select, extract, and_, or_, not_, asc
 
 from settings.db import DO_SETTINGS as do_settings
 from settings.ftp import FORECAST_FTP
@@ -178,7 +178,7 @@ def get_current_forecast(site_id, dates, connection, db_table):
     return forecast_data
 
 
-def get_applied_forecast(site_id, year, month, connection, db_table):
+def get_applied_forecast_old(site_id, year, month, connection, db_table):
     base = dt.date(year=year, month=month, day=1)
     dates_range = [base + dt.timedelta(days=days) for days in range(calendar.monthrange(year, month)[-1])]
 
@@ -192,6 +192,28 @@ def get_applied_forecast(site_id, year, month, connection, db_table):
         forecast_data = pd.concat([forecast_data, data])
     forecast_data = forecast_data.sort_index()
     return forecast_data.multiply(1000).astype(int)
+
+
+def get_applied_forecast(site_id, year, month, connection, db_table):
+    forecasting_data_table = db_table
+    forecasting_data_query = select([
+        forecasting_data_table.c.data_type,
+        forecasting_data_table.c.data_timestamp_utc,
+        forecasting_data_table.c.data_value
+        ])\
+        .filter(extract('year', forecasting_data_table.c.date) == year)\
+        .filter(extract('month', forecasting_data_table.c.date) == month)\
+        .filter(forecasting_data_table.c.data_type == 'forecast_applied_corrected')\
+        .filter(forecasting_data_table.c.site_id == site_id)\
+        .order_by(forecasting_data_table.c.data_timestamp_utc.asc())
+    forecasting_data = connection.execute(forecasting_data_query).fetchall()
+    applied_forecast = pd.DataFrame(
+        data=[r.data_value for r in forecasting_data],
+        index=[r.data_timestamp_utc for r in forecasting_data],
+        columns=['forecast [kWh]'],
+        dtype='float')
+    applied_forecast = applied_forecast.astype(int)
+    return applied_forecast
 
 
 def get_fc_info(site_id, date, available_before=None, connection=None, db_table=None):
