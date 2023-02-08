@@ -180,7 +180,9 @@ if __name__ == '__main__':
                 'cieq_641_rule (net) [UAH]', 'cieq_641_rule (net) [%]', 
                 'imsp_avg_641_rule [UAH/MWh]',
                 'cieq_641_rule* [UAH]', 'cieq_641_rule* [%]', 
-                'imsp_avg_641_rule* [UAH/MWh]']
+                'imsp_avg_641_rule* [UAH/MWh]',
+                'cieq_641_rule_positive* [UAH]', 'cieq_641_rule_negative* [UAH]',
+                'cieq_641_rule_positive* [%]', 'cieq_641_rule_negative* [%]']
 
     daily_indexes = list()
 
