@@ -194,15 +194,15 @@ def get_applied_forecast_old(site_id, year, month, connection, db_table):
     return forecast_data.multiply(1000).astype(int)
 
 
-def get_applied_forecast(site_id, year, month, connection, db_table):
+def get_applied_forecast(site_id, first_date, last_date, connection, db_table):
     forecasting_data_table = db_table
     forecasting_data_query = select([
         forecasting_data_table.c.data_type,
         forecasting_data_table.c.data_timestamp_utc,
         forecasting_data_table.c.data_value
         ])\
-        .filter(extract('year', forecasting_data_table.c.date) == year)\
-        .filter(extract('month', forecasting_data_table.c.date) == month)\
+        .filter(forecasting_data_table.c.date >= first_date)\
+        .filter(forecasting_data_table.c.date <= last_date)\
         .filter(forecasting_data_table.c.data_type == 'forecast_applied_corrected')\
         .filter(forecasting_data_table.c.site_id == site_id)\
         .order_by(forecasting_data_table.c.data_timestamp_utc.asc())
