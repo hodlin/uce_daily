@@ -779,6 +779,35 @@ def get_gpee_final_forecast_cor(site_name, target_period, data_folder='./data/fo
         return read_gpee_data(site_name, data_files[site_name], data_folder + target_period + '/', sheet_name='Остаточний прогноз з обмеженням')
 
 
+def put_forecast(site_id, data_type, date, hours, time_indexes, data_values, update_time=None, connection=None):
+
+    columns = ["site_id", "data_type", "date", "hour", "data_timestamp_utc", "data_value", "units", "last_updated_utc"]
+    records = list()
+
+    for hour, time_index, value in zip (hours, time_indexes, data_values):
+        record = (
+            site_id,
+            data_type,
+            date.strftime('%Y-%m-%d'),
+            hour,
+            time_index.strftime('%Y-%m-%dT%H:%M'),
+            value,
+            "kWh",
+            update_time.strftime('%Y-%m-%dT%H:%M:%S') if update_time is not None else dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+        )
+        records.append(record)
+
+    query_1 = f"INSERT INTO forecasting_data({','.join(columns)}) VALUES {str(records).replace('[', '').replace(']', '')}"
+    query_2 = '''
+        ON CONFLICT (site_id, data_type, date, hour) 
+        DO UPDATE SET
+        data_timestamp_utc = excluded.data_timestamp_utc,
+        data_value = excluded.data_value,
+        last_updated_utc = excluded.last_updated_utc'''
+    # print(query_1, query_2)
+    connection.execute(query_1 + '\n' + query_2)
+    
+
 if __name__ == '__main__':
     data = get_gpee_final_forecast('Afanasiivka', '2021-09_1-20')
     print(data.head(20))
