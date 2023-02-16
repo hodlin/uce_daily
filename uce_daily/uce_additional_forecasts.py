@@ -16,7 +16,7 @@ if __name__ == '__main__':
     target_year = int(sys.argv[1])
     target_month = int(sys.argv[2])
 
-    forecasts_types = ['real', 'naive', 'zero', '1_dah', 'pro', 'restored']
+    forecasts_types = ['real', 'naive', 'zero', '1_dah', 'pro', 'raw']
 
     # sites_list = ['Myroliubivka']
     sites_data = dict.fromkeys(sites_list)
@@ -45,6 +45,13 @@ if __name__ == '__main__':
                                 end=prices.index.date.max(), 
                                 freq='D').to_pydatetime()
 
+    min_price_day = (prices.index.min() + dt.timedelta(days=1)).day
+    max_price_day = prices.index.max().day
+
+    start_date = dt.date(year=target_year, month=target_month, day=min_price_day)
+    end_date = dt.date(year=target_year, month=target_month, day=max_price_day)
+    print(start_date, end_date)
+
     with engine.connect() as connection:
             
         for site in sites_data.keys():
@@ -66,8 +73,9 @@ if __name__ == '__main__':
                                                             connection, metadata.tables['mms_data'], include_prev=True,)
             # print(mms_data)
             print('MMS data | {} version | of | {} records |'.format(site_data['mms_version'], len(mms_data)))
-            applied_forecast = get_applied_forecast(site_data['site_id'], target_year, target_month, 
-                                                    connection=connection, db_table=metadata.tables['forecasts_applied'])
+
+            applied_forecast = get_applied_forecast(site_data['site_id'], start_date, end_date, 
+                                                connection=connection, db_table=metadata.tables['forecasting_data'])
             print('Forecast data of | {} records |'.format(len(applied_forecast)))
             #print(applied_forecast)
             
@@ -76,6 +84,13 @@ if __name__ == '__main__':
 
             site_data['zero_forecast_data'] = pd.concat([mms_data, applied_forecast * 0], axis=1, join='inner')
             print('Zero forecast data prepared')
+
+            raw_forecast = get_applied_forecast(site_data['site_id'], start_date, end_date, 
+                                            connection=connection, db_table=metadata.tables['forecasting_data'],
+                                            forecast_type='forecast_applied_raw')
+
+            site_data['raw_forecast_data'] = pd.concat([mms_data, raw_forecast], axis=1, join='inner')
+            print('Raw forecast data prepared')
 
             naive_forecast_data = pd.concat([mms_data, mms_data.shift(48)], axis=1, join='inner').dropna(axis=0, how='any')
             naive_forecast_data.columns = ['yield [kWh]', 'forecast [kWh]']
@@ -95,66 +110,62 @@ if __name__ == '__main__':
             # site_data['pro_forecast_data'] = pro_forecast
             # print('Pro forecast data prepared')
 
-            restored_forecast = get_forecast(site_data['site_id'], target_dates, 'restored', connection, metadata) * 1000
-            restored_forecast = pd.concat([mms_data, restored_forecast.round(0)], axis=1, join='inner')
-            site_data['restored_forecast_data'] = restored_forecast
-            print('Restored forecast data prepared')
-
-            decreased_70_forecast = restored_forecast['forecast [kWh]'].copy()
+            
+            decreased_70_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_70_forecast.loc[decreased_70_forecast > 0] = decreased_70_forecast.loc[decreased_70_forecast > 0] * 0.3
             decreased_70_forecast = pd.concat([mms_data, decreased_70_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_70_forecast_data'] = decreased_70_forecast
             print('Decreased forecast -70pu data prepared')
             
-            decreased_60_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_60_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_60_forecast.loc[decreased_60_forecast > 0] = decreased_60_forecast.loc[decreased_60_forecast > 0] * 0.4
             decreased_60_forecast = pd.concat([mms_data, decreased_60_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_60_forecast_data'] = decreased_60_forecast
             print('Decreased forecast -60pu data prepared')
 
-            decreased_50_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_50_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_50_forecast.loc[decreased_50_forecast > 0] = decreased_50_forecast.loc[decreased_50_forecast > 0] * 0.5
             decreased_50_forecast = pd.concat([mms_data, decreased_50_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_50_forecast_data'] = decreased_50_forecast
             print('Decreased forecast -50pu data prepared')
 
-            decreased_40_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_40_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_40_forecast.loc[decreased_40_forecast > 0] = decreased_40_forecast.loc[decreased_40_forecast > 0] * 0.6
             decreased_40_forecast = pd.concat([mms_data, decreased_40_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_40_forecast_data'] = decreased_40_forecast
             print('Decreased forecast -40pu data prepared')
 
-            decreased_30_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_30_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_30_forecast.loc[decreased_30_forecast > 0] = decreased_30_forecast.loc[decreased_30_forecast > 0] * 0.7
             decreased_30_forecast = pd.concat([mms_data, decreased_30_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_30_forecast_data'] = decreased_30_forecast
             print('Decreased forecast -30pu data prepared')
 
-            decreased_20_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_20_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_20_forecast.loc[decreased_20_forecast > 0] = decreased_20_forecast.loc[decreased_20_forecast > 0] * 0.8
             decreased_20_forecast = pd.concat([mms_data, decreased_20_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_20_forecast_data'] = decreased_20_forecast
             print('Decreased forecast -20pu data prepared')
 
-            decreased_10_forecast = restored_forecast['forecast [kWh]'].copy()
+            decreased_10_forecast = raw_forecast['forecast [kWh]'].copy()
             decreased_10_forecast.loc[decreased_10_forecast > 0] = decreased_10_forecast.loc[decreased_10_forecast > 0] * 0.9
             decreased_10_forecast = pd.concat([mms_data, decreased_10_forecast.round(0)], axis=1, join='inner')
             site_data['decreased_10_forecast_data'] = decreased_10_forecast
             print('Decreased forecast -10pu data prepared')
 
-            increased_10_forecast = restored_forecast['forecast [kWh]'].copy()
+            increased_10_forecast = raw_forecast['forecast [kWh]'].copy()
             increased_10_forecast.loc[increased_10_forecast > 0] = increased_10_forecast.loc[increased_10_forecast > 0] * 1.1
             increased_10_forecast = pd.concat([mms_data, increased_10_forecast.round(0)], axis=1, join='inner')
             site_data['increased_10_forecast_data'] = increased_10_forecast
             print('Increased forecast +10pu data prepared')
 
-            increased_20_forecast = restored_forecast['forecast [kWh]'].copy()
+            increased_20_forecast = raw_forecast['forecast [kWh]'].copy()
             increased_20_forecast.loc[increased_20_forecast > 0] = increased_20_forecast.loc[increased_20_forecast > 0] * 1.2
             increased_20_forecast = pd.concat([mms_data, increased_20_forecast.round(0)], axis=1, join='inner')
             site_data['increased_20_forecast_data'] = increased_20_forecast
             print('Increased forecast +20pu data prepared')
 
-            increased_30_forecast = restored_forecast['forecast [kWh]'].copy()
+            increased_30_forecast = raw_forecast['forecast [kWh]'].copy()
             increased_30_forecast.loc[increased_30_forecast > 0] = increased_30_forecast.loc[increased_30_forecast > 0] * 1.3
             increased_30_forecast = pd.concat([mms_data, increased_30_forecast.round(0)], axis=1, join='inner')
             site_data['increased_30_forecast_data'] = increased_30_forecast
@@ -200,7 +211,7 @@ if __name__ == '__main__':
     results_zero = pd.DataFrame(columns=columns)
     results_1_dah = pd.DataFrame(columns=columns)
     # results_pro = pd.DataFrame(columns=columns)
-    results_restored = pd.DataFrame(columns=columns)
+    results_raw = pd.DataFrame(columns=columns)
     results_decreased_70 = pd.DataFrame(columns=columns)
     results_decreased_60 = pd.DataFrame(columns=columns)
     results_decreased_50 = pd.DataFrame(columns=columns)
@@ -232,7 +243,7 @@ if __name__ == '__main__':
             # result_pro = make_results(sites_data[site], 'pro', prices, index)      
             # #print(result_pro)
 
-            result_restored = make_results(sites_data[site], 'restored', prices, index)
+            result_raw = make_results(sites_data[site], 'raw', prices, index)
             #print(result_restored)
 
             result_decreased_70 = make_results(sites_data[site], 'decreased_70', prices, index)
@@ -280,9 +291,10 @@ if __name__ == '__main__':
             # if not result_pro is None:
             #     results_pro = results_pro.append(result_pro, ignore_index=True)
 
-            if not result_restored is None:
-                results_restored = results_restored.append(result_restored, ignore_index=True)
-            
+            if not result_raw is None:
+                results_raw = results_raw.append(result_raw, ignore_index=True)
+
+                        
             if not result_decreased_70 is None:
                 results_decreased_70 = results_decreased_70.append(result_decreased_70, ignore_index=True)
 
@@ -320,7 +332,7 @@ if __name__ == '__main__':
         sites_data[site]['results_zero'] = results_zero
         sites_data[site]['results_1_dah'] = results_1_dah
         # sites_data[site]['results_pro'] = results_pro
-        sites_data[site]['results_restored'] = results_restored
+        sites_data[site]['results_raw'] = results_raw
         sites_data[site]['results_decreased_70'] = results_decreased_70
         sites_data[site]['results_decreased_60'] = results_decreased_60
         sites_data[site]['results_decreased_50'] = results_decreased_50
@@ -335,7 +347,7 @@ if __name__ == '__main__':
         print(f'{site} - Results daily: Ok!')
 
 
-    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_restored, results_increased_10, results_increased_20, results_increased_30, results_decreased_70, results_decreased_60, results_decreased_50, results_decreased_40, results_decreased_30, results_decreased_20, results_decreased_10], axis=0)
+    results_daily = pd.concat([results_real, results_naive, results_zero, results_1_dah, results_raw, results_increased_10, results_increased_20, results_increased_30, results_decreased_70, results_decreased_60, results_decreased_50, results_decreased_40, results_decreased_30, results_decreased_20, results_decreased_10], axis=0)
 
     days = '{}-{}'.format(results_daily['first_date'].min().day, results_daily['first_date'].max().day)
 
