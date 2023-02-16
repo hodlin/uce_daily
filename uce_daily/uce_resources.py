@@ -460,6 +460,8 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
     elif forecast_type == 'zero':
         data = site_data['zero_forecast_data'].loc[site_data['zero_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'raw':
+        data = site_data['raw_forecast_data'].loc[site_data['raw_forecast_data'].index.intersection(index)]
     elif forecast_type == '1_dah':
         data = site_data['1_dah_forecast_data'].loc[site_data['1_dah_forecast_data'].index.intersection(index)]
     elif forecast_type == 'pro':
