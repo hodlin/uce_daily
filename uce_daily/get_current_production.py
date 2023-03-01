@@ -15,10 +15,10 @@ class OperativeProduction:
         self.inverters = dict()
         self.analyzers = dict()
 
-        self.login_endpoint = "/api/v1/mainserv/login"
-        self.get_sites_endpoint = "/api/v1/mainserv/site/get/my"
-        self.get_devices_endpoint = "/api/v1/mainserv/device/get/{}"
-        self.get_data_endpoint = "/api/v1/mainserv/get/data/{}/{}"
+        self.login_endpoint = "/api/v1/mainapi/login/"
+        self.get_sites_endpoint = "/api/v1/mainapi/site/get/my"
+        self.get_devices_endpoint = "/api/v1/mainapi/device/get/{}"
+        self.get_data_endpoint = "/api/v1/mainapi/get/data/{}/{}"
 
         self.login()
         self.update_site_ids()
@@ -47,7 +47,8 @@ class OperativeProduction:
             "token": self.access_token
         }
         try:
-            response = requests.get(self.url + self.get_sites_endpoint, headers=header, verify=False)
+            response = requests.get(self.url + self.get_sites_endpoint, headers=header, verify=True)
+            
             for site in response.json():
                 self.site_ids.update({site["w_code"]: site["station_id"]})
             response.raise_for_status()
@@ -119,12 +120,16 @@ class OperativeProduction:
             print(f'Data read successfully: {site_id}, {device_id}')
 
         data = pd.DataFrame.from_records(response.json(), coerce_float=True)
-        data.index = data["time_metric"].apply(lambda x: dt.datetime.strptime(x, "%Y-%m-%dT%H:%M:%S"))
+        try:
+            data.index = data["time_metric"].apply(lambda x: dt.datetime.strptime(x, "%Y-%m-%dT%H:%M:%S"))
+        except Exception as err:
+            return None
+        
         data.drop(columns=["time_metric"], inplace=True)
         data = data.resample("1H").mean()
         data.index = data.index + dt.timedelta(minutes=30)
         data.columns = ["yield"]
-        data = data.loc[data["yield"] >= 0.01]
+        # data = data.loc[data["yield"] >= 0.01]
         return data
 
     def prepare_site_data(self, site_id, utc_time_index, devices, parameter_name):
@@ -138,10 +143,12 @@ class OperativeProduction:
                 utc_time_index.max() + dt.timedelta(minutes=30),
                 parameter_name
             )
-            data = data + device_data
+            if device_data is not None:
+                data = data + device_data
 
         data.dropna(axis=0, inplace=True)
         data = data.round(0).astype(int)
+        data = data[data['yield'] != 0]
         return data
 
     def get_data(self, w_code, date):
@@ -158,8 +165,9 @@ class OperativeProduction:
 if __name__ == "__main__":
     from settings.apis import BORD_API_SETTINGS
 
-    w_code = "62W572773934392R"
-    date = dt.date(2022, 12, 4)
+    w_code = "62W242414167316W"
+    print(type(w_code))
+    date = dt.date(2023, 2, 27)
 
     InverterDataGetter = OperativeProduction(**BORD_API_SETTINGS)
     print(InverterDataGetter.get_data(w_code, date))
