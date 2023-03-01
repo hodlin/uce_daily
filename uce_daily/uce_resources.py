@@ -456,6 +456,8 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['real_forecast_data'].loc[site_data['real_forecast_data'].index.intersection(index)]
     elif forecast_type == 'limitation':
         data = site_data['limitation_forecast_data'].loc[site_data['limitation_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'limitation_raw':
+        data = site_data['limitation_forecast_raw_data'].loc[site_data['limitation_forecast_raw_data'].index.intersection(index)]
     elif forecast_type == 'naive':
         data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
     elif forecast_type == 'zero':
@@ -612,6 +614,8 @@ def make_forecasting_results(site_data, forecast_type, index):
         data = site_data['real_forecast_data'].loc[site_data['real_forecast_data'].index.intersection(index)]
     elif forecast_type == 'limitation':
         data = site_data['limitation_forecast_data'].loc[site_data['limitation_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'limitation_raw':
+        data = site_data['limitation_forecast_raw_data'].loc[site_data['limitation_forecast_raw_data'].index.intersection(index)]
     elif forecast_type == 'naive':
         data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
     elif forecast_type == 'gpee':
