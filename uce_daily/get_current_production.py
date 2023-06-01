@@ -3,6 +3,7 @@ import requests
 from requests import HTTPError
 import datetime as dt
 import pandas as pd
+import math
 
 
 class OperativeProduction:
@@ -33,7 +34,7 @@ class OperativeProduction:
             "password": self.password
         }
         try:
-            response = requests.post(self.url + self.login_endpoint, data=json.dumps(data), headers=header, verify=False)
+            response = requests.post(self.url + self.login_endpoint, data=json.dumps(data), headers=header) #, verify=False)
             self.access_token = response.json()["access_token"]
             response.raise_for_status()
         except Exception as err:
@@ -47,7 +48,7 @@ class OperativeProduction:
             "token": self.access_token
         }
         try:
-            response = requests.get(self.url + self.get_sites_endpoint, headers=header, verify=True)
+            response = requests.get(self.url + self.get_sites_endpoint, headers=header) #, verify=True)
             
             for site in response.json():
                 self.site_ids.update({site["w_code"]: site["station_id"]})
@@ -69,7 +70,7 @@ class OperativeProduction:
         }
         for site_id in site_ids:
             try:
-                response = requests.get(self.url + self.get_devices_endpoint.format(site_id), headers=header, verify=False)
+                response = requests.get(self.url + self.get_devices_endpoint.format(site_id), headers=header) #, verify=False)
                 inverters = list()
                 for device in response.json():
                     if device["device_name"][:8] == "Inverter":
@@ -110,8 +111,8 @@ class OperativeProduction:
             response = requests.post(
                 self.url + self.get_data_endpoint.format(site_id, device_id),
                 data=json.dumps(data),
-                headers=header,
-                verify=False
+                headers=header
+            #    verify=False
             )
             response.raise_for_status()
         except Exception as err:
@@ -129,7 +130,8 @@ class OperativeProduction:
         data = data.resample("1H").mean()
         data.index = data.index + dt.timedelta(minutes=30)
         data.columns = ["yield"]
-        # data = data.loc[data["yield"] >= 0.01]
+        #data = data.loc[data["yield"] >= 0.01]
+        data = data.fillna(0)
         return data
 
     def prepare_site_data(self, site_id, utc_time_index, devices, parameter_name):
@@ -165,9 +167,9 @@ class OperativeProduction:
 if __name__ == "__main__":
     from settings.apis import BORD_API_SETTINGS
 
-    w_code = "62W242414167316W"
+    w_code = "62W2684258632624"
     print(type(w_code))
-    date = dt.date(2023, 2, 27)
+    date = dt.date(2023, 4, 11)
 
     InverterDataGetter = OperativeProduction(**BORD_API_SETTINGS)
     print(InverterDataGetter.get_data(w_code, date))
