@@ -166,9 +166,9 @@ class OperativeProduction:
 if __name__ == "__main__":
     from settings.apis import BORD_API_SETTINGS
 
-    w_code = "62W8511445473287"
+    w_code = "62W767068546620M"
     print(type(w_code))
-    date = dt.date(2023, 3, 30)
+    date = dt.date(2023, 4, 13)
 
-    InverterDataGetter = OperativeProduction(**BORD_API_SETTINGS)
-    print(InverterDataGetter.get_data(w_code, date))
+    PowermeterDataGetter = OperativeProduction(**BORD_API_SETTINGS)
+    print(PowermeterDataGetter.get_data(w_code, date))
