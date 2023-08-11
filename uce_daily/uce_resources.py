@@ -494,6 +494,8 @@ def make_results(site_data, forecast_type, prices, index):
         data = site_data['increased_20_forecast_data'].loc[site_data['increased_20_forecast_data'].index.intersection(index)]
     elif forecast_type == 'increased_30':
         data = site_data['increased_30_forecast_data'].loc[site_data['increased_30_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_40':
+        data = site_data['increased_40_forecast_data'].loc[site_data['increased_40_forecast_data'].index.intersection(index)]
     else:
         data = site_data[forecast_type].loc[site_data[forecast_type].index.intersection(index)]
 
@@ -812,9 +814,117 @@ def put_forecast(site_id, data_type, date, hours, time_indexes, data_values, upd
         last_updated_utc = excluded.last_updated_utc'''
     # print(query_1, query_2)
     connection.execute(query_1 + '\n' + query_2)
+
+
+def make_results_hourly(site_data, forecast_type, prices, index, region, cluster):
+    #print(site_data)
+    if forecast_type == 'real':
+        data = site_data['real_forecast_data'].loc[site_data['real_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'limitation':
+        data = site_data['limitation_forecast_data'].loc[site_data['limitation_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'limitation_raw':
+        data = site_data['limitation_forecast_raw_data'].loc[site_data['limitation_forecast_raw_data'].index.intersection(index)]
+    elif forecast_type == 'naive':
+        data = site_data['naive_forecast_data'].loc[site_data['naive_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'zero':
+        data = site_data['zero_forecast_data'].loc[site_data['zero_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'raw':
+        data = site_data['raw_forecast_data'].loc[site_data['raw_forecast_data'].index.intersection(index)]
+    elif forecast_type == '1_dah':
+        data = site_data['1_dah_forecast_data'].loc[site_data['1_dah_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'pro':
+        data = site_data['pro_forecast_data'].loc[site_data['pro_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'restored':
+        data = site_data['restored_forecast_data'].loc[site_data['restored_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'restored_lim':
+        data = site_data['restored_forecast_data_lim'].loc[site_data['restored_forecast_data_lim'].index.intersection(index)]
+    elif forecast_type == 'enercast':
+        data = site_data['enercast_forecast_data'].loc[site_data['enercast_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_70':
+        data = site_data['decreased_70_forecast_data'].loc[site_data['decreased_70_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_60':
+        data = site_data['decreased_60_forecast_data'].loc[site_data['decreased_60_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_50':
+        data = site_data['decreased_50_forecast_data'].loc[site_data['decreased_50_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_40':
+        data = site_data['decreased_40_forecast_data'].loc[site_data['decreased_40_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_30':
+        data = site_data['decreased_30_forecast_data'].loc[site_data['decreased_30_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_20':
+        data = site_data['decreased_20_forecast_data'].loc[site_data['decreased_20_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'decreased_10':
+        data = site_data['decreased_10_forecast_data'].loc[site_data['decreased_10_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_10':
+        data = site_data['increased_10_forecast_data'].loc[site_data['increased_10_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_20':
+        data = site_data['increased_20_forecast_data'].loc[site_data['increased_20_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_30':
+        data = site_data['increased_30_forecast_data'].loc[site_data['increased_30_forecast_data'].index.intersection(index)]
+    elif forecast_type == 'increased_40':
+        data = site_data['increased_40_forecast_data'].loc[site_data['increased_40_forecast_data'].index.intersection(index)]
+    else:
+        data = site_data[forecast_type].loc[site_data[forecast_type].index.intersection(index)]
+
+    data = pd.concat([prices, data], axis=1, join='inner')
+
+    if len(data.index) == 0:
+        return None
+
+    if len(data.index) != 24:
+        print('{} index len is {}'.format(data.index.max().strftime('%Y-%m-%d'), len(data.index)))
+
     
+        
+    with np.errstate(divide='ignore'):
+        green_tariff = site_data['green_tariff'][data.index.max().month] if type(site_data['green_tariff']) == type(dict()) else site_data['green_tariff']
+        data['site'] = site_data['site']
+        data['region'] = region
+        data['cluster'] = cluster
+        data['first_date'] = data.index.max().date()
+        data['last_date'] = data.index.tz_localize(pytz.utc).tz_convert(pytz.timezone('europe/kiev')).strftime('%Y-%m-%d')
+        data['hour'] = data.index.tz_localize(pytz.utc).tz_convert(pytz.timezone('europe/kiev')).strftime('%H:%M')
+        data['forecast_type'] = forecast_type
+
+        data['revenue [UAH]'] = data['yield [kWh]'] * green_tariff
+
+        data['error_u [kWh]'] = data['yield [kWh]'] - data['forecast [kWh]']
+        data['error_u [%]'] = data['error_u [kWh]'] / data['forecast [kWh]'] * 100
+
+        excess_mask = data['error_u [kWh]'] >= 0
+        shortage_mask = data['error_u [kWh]'] < 0
+
+        data['error_u (excess) [kWh]'] = data['error_u [kWh]'] * excess_mask
+        data['error_u (shortage) [kWh]'] = data['error_u [kWh]'] * shortage_mask
+
+        data['alfa_u_mask'] = data['error_u [%]'].apply(abs) > 5.0
+
+        data['cieq_641_rule (excess) [UAH]'] = data['error_u (excess) [kWh]'] * data['alfa_u_mask'] * \
+                                        (data['dam'] - data['positive_unbalance']) 
+
+        data['cieq_641_rule (shortage) [UAH]'] = data['error_u (shortage) [kWh]'] * data['alfa_u_mask'] * \
+                                        (data['dam'] - data['negative_unbalance'])
+
+        data['cieq_641_rule (net) [UAH]'] = data['cieq_641_rule (excess) [UAH]'] + data['cieq_641_rule (shortage) [UAH]']
+
+        mask_641_1 = (data['imsp'] < data['dam']) & (data['error_u [kWh]'] > 0)
+        mask_641_2 = (data['imsp'] > data['dam']) & (data['error_u [kWh]'] < 0)
+        mask_641 = mask_641_1 | mask_641_2
+        
+        data['641_mask'] = mask_641 & data['alfa_u_mask']
+        data['641_mask_positive'] = mask_641_1 & data['alfa_u_mask']
+        data['641_mask_negative'] = mask_641_2 & data['alfa_u_mask']
+        
+        data['641_price'] = data['dam'] - data['imsp']
+        data['cieq_641_rule* [UAH]'] = data['error_u [kWh]'] * data['641_price'] * data['641_mask'] * data['alfa_u_mask']
+        data['cieq_641_rule_positive* [UAH]'] = data['error_u [kWh]'] * data['641_price'] * data['641_mask_positive'] * data['alfa_u_mask']
+        data['cieq_641_rule_negative* [UAH]'] = data['error_u [kWh]'] * data['641_price'] * data['641_mask_negative'] * data['alfa_u_mask']
+        # print(data)
+        # print(type(data))
+
+    return data
+
 
 if __name__ == '__main__':
-    data = get_gpee_final_forecast('Afanasiivka', '2021-09_1-20')
+    data = make_results_hourly('Bar', 'real', '000','2023-06-30 21:30:00')
     print(data.head(20))
 
