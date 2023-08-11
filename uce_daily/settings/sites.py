@@ -6,9 +6,13 @@ kherson = ['Myroliubivka', 'Kyselivka', 'Poniativka', 'Kostohryzove', 'Bilozerka
                  'Komyshany_1', 'Komyshany_2', 'Velihen', 'Veliton', 'Mala_Lepetykha', 'Rubanivka', 'Oleshky_2', 'Oleshky_1',
                  'Liubymivka', 'Kachkarivka', 'Vasylivka']
 
+kherson_wo_occ = ['Myroliubivka', 'Bilozerka', 'Komyshany_1', 'Komyshany_2']
+
 mykolaiiv = ['Afanasiivka', 'Novokondakove', 'Bazaltova', 'Yelanets_1', 'Yelanets_2', 'Inhulets_1', 'Inhulets_2', 'Bereznehuvate', 'Teplychna']
 
 zaporizhzhia = ['Solone', 'Stepnohirsk']
+
+zaporizhzhia_wo_occ = ['Solone']
 
 dnipro = ['Balivka']
 
@@ -17,6 +21,8 @@ kirovohrad = ['Dibrovka']
 odesa = ['Kulevcha']
 
 ceg = [*vinnytsia, *kherson, *mykolaiiv, *zaporizhzhia, *dnipro, *kirovohrad, *odesa]
+
+ceg_wo_occ = [*vinnytsia, *kherson_wo_occ, *mykolaiiv, *zaporizhzhia_wo_occ, *dnipro, *kirovohrad, *odesa]
 
 solarm = ['Shyroke']
 
