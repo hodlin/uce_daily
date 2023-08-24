@@ -26,6 +26,8 @@ ceg_wo_occ = [*vinnytsia, *kherson_wo_occ, *mykolaiiv, *zaporizhzhia_wo_occ, *dn
 
 solarm = ['Shyroke']
 
+kness_test = ['Bilashky', 'Cherniatka', 'Yelanets_1', 'Teplychna']
+
 all = [*ceg, *solarm]
 
 test = ['Stepnohirsk', 'Afanasiivka', 'Myroliubivka', 'Pohrebyshche', 'Shyroke']
