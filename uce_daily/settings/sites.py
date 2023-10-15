@@ -28,6 +28,8 @@ solarm = ['Shyroke']
 
 kness_test = ['Bilashky', 'Cherniatka', 'Yelanets_1', 'Teplychna']
 
+DAM_sites = ['Bilashky', 'Sharhorod_1']
+
 all = [*ceg, *solarm]
 
 test = ['Stepnohirsk', 'Afanasiivka', 'Myroliubivka', 'Pohrebyshche', 'Shyroke']
