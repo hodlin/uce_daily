@@ -7,7 +7,7 @@ import calendar
 from uce_resources import get_site_id, get_mms_data, get_applied_forecast, get_prices, get_green_tariff
 from uce_resources import make_results, get_forecast
 
-from settings.sites import ceg_wo_occ as sites_list
+from settings.sites import ceg_mms as sites_list
 
 if __name__ == '__main__':
 
