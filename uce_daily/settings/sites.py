@@ -6,7 +6,7 @@ kherson = ['Myroliubivka', 'Kyselivka', 'Poniativka', 'Kostohryzove', 'Bilozerka
                  'Komyshany_1', 'Komyshany_2', 'Velihen', 'Veliton', 'Mala_Lepetykha', 'Rubanivka', 'Oleshky_2', 'Oleshky_1',
                  'Liubymivka', 'Kachkarivka', 'Vasylivka']
 
-kherson_wo_occ = ['Myroliubivka', 'Bilozerka', 'Komyshany_1', 'Komyshany_2']
+kherson_wo_occ = ['Myroliubivka', 'Kyselivka', 'Bilozerka', 'Komyshany_1', 'Komyshany_2']
 
 mykolaiiv = ['Afanasiivka', 'Novokondakove', 'Bazaltova', 'Yelanets_1', 'Yelanets_2', 'Inhulets_1', 'Inhulets_2', 'Bereznehuvate', 'Teplychna']
 
@@ -20,9 +20,16 @@ kirovohrad = ['Dibrovka']
 
 odesa = ['Kulevcha']
 
+tivoli = ['Kovalyn_PVSPP']
+
 ceg = [*vinnytsia, *kherson, *mykolaiiv, *zaporizhzhia, *dnipro, *kirovohrad, *odesa]
 
 ceg_wo_occ = [*vinnytsia, *kherson_wo_occ, *mykolaiiv, *zaporizhzhia_wo_occ, *dnipro, *kirovohrad, *odesa]
+
+ceg_mms = ['Bar', 'Verkhivka', 'Balky', 'Sharhorod_1', 'Chechelnyk_1', 'Chechelnyk_2', 'Stanislavchyk', 'Kopaihorod',
+                   'Cherniatka', 'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 'Pohrebyshche', 'Myroliubivka', 'Kyselivka',
+                   'Bilozerka', 'Komyshany_1', 'Komyshany_2', 'Afanasiivka', 'Novokondakove', 'Bazaltova', 'Inhulets_1', 'Inhulets_2', 'Teplychna', 
+                   'Solone', 'Balivka', 'Dibrovka' ]
 
 solarm = ['Shyroke']
 
