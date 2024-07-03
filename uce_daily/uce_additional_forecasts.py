@@ -7,7 +7,7 @@ import calendar
 from uce_resources import get_site_id, get_mms_data, get_applied_forecast, get_prices, get_green_tariff
 from uce_resources import make_results, get_forecast
 
-from settings.sites import ceg_mms as sites_list
+from settings.sites import ceg_wo_occ as sites_list
 
 if __name__ == '__main__':
 
@@ -35,8 +35,8 @@ if __name__ == '__main__':
         
         prices = get_prices(target_year, target_month, connection, metadata.tables['electricity_market_prices'], currency='UAH')
 
-    # price_dir = 'data/results/2022-10/'
-    # price_file = 'prices_2022_10_1-19.xlsx'
+    # price_dir = 'data/results/2024-05/'
+    # price_file = 'prices_2024_5_1-31.xlsx'
     # prices = pd.read_excel(price_dir + price_file, index_col= 0)
 
     print(prices)
@@ -351,7 +351,7 @@ if __name__ == '__main__':
 
     days = '{}-{}'.format(results_daily['first_date'].min().day, results_daily['first_date'].max().day)
 
-    with pd.ExcelWriter('data/results/{}-{:0>2}/uce_a_daily_{}_{}_{}_UAH.xlsx'.format(target_year, target_month, target_year, target_month, days), engine="openpyxl") as writer:
+    with pd.ExcelWriter('C:/Users/o.babenko/projects/uce_daily/uce_daily/data/results/{}-{:0>2}/uce_a_daily_{}_{}_{}_UAH.xlsx'.format(target_year, target_month, target_year, target_month, days), engine="openpyxl") as writer:
         results_daily.to_excel(writer, 'results_daily')
 
     print('Saving results: ok!')

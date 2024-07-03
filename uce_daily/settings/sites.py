@@ -26,10 +26,11 @@ ceg = [*vinnytsia, *kherson, *mykolaiiv, *zaporizhzhia, *dnipro, *kirovohrad, *o
 
 ceg_wo_occ = [*vinnytsia, *kherson_wo_occ, *mykolaiiv, *zaporizhzhia_wo_occ, *dnipro, *kirovohrad, *odesa]
 
-ceg_mms = ['Bar', 'Verkhivka', 'Balky', 'Sharhorod_1', 'Chechelnyk_1', 'Chechelnyk_2', 'Stanislavchyk', 'Kopaihorod',
-                   'Cherniatka', 'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 'Pohrebyshche', 'Myroliubivka', 'Kyselivka',
-                   'Bilozerka', 'Komyshany_1', 'Komyshany_2', 'Afanasiivka', 'Novokondakove', 'Bazaltova', 'Inhulets_1', 'Inhulets_2', 'Teplychna', 
-                   'Solone', 'Balivka', 'Dibrovka' ]
+ceg_mms = ['Pohrebyshche', 'Bar', 'Balky', 'Verkhivka', 'Kopaihorod', 'Stanislavchyk', 'Sharhorod_1', 'Hlybochok_1', 'Hlybochok_2.1', 'Hlybochok_2.2', 
+                    'Cherniatka', 'Chechelnyk_1', 'Chechelnyk_2', 
+                    'Komyshany_1', 'Komyshany_2', 'Bilozerka', 'Myroliubivka', 'Kyselivka', 
+                    'Dibrovka', 'Afanasiivka', 'Bazaltova', 'Novokondakove', 'Inhulets_1', 'Inhulets_2', 'Teplychna', 
+                    'Solone', 'Balivka']
 
 solarm = ['Shyroke']
 
