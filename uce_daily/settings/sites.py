@@ -22,7 +22,7 @@ odesa = ['Kulevcha']
 
 tivoli = ['Kovalyn_PVSPP']
 
-ceg = [*vinnytsia, *kherson, *mykolaiiv, *zaporizhzhia, *dnipro, *kirovohrad, *odesa]
+ceg = [*vinnytsia, *kherson, *mykolaiiv, *zaporizhzhia, *dnipro, *kirovohrad, *odesa, *tivoli]
 
 ceg_wo_occ = [*vinnytsia, *kherson_wo_occ, *mykolaiiv, *zaporizhzhia_wo_occ, *dnipro, *kirovohrad, *odesa]
 
